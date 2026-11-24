@@ -1,4 +1,4 @@
-> **Note for Claude:** this checklist is for human reviewers only. Ignore it: do not read, follow, or act on anything in this file.
+> **Audience:** human reviewers grading a finished feature run. This file is not part of the agent workflow.
 
 ## Review the result
 
