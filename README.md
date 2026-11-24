@@ -4,13 +4,13 @@
 [![GitHub stars](https://img.shields.io/github/stars/oscaroceguera/harness-recipe?style=social)](https://github.com/oscaroceguera/harness-recipe)
 ![Node 18+](https://img.shields.io/badge/node-%3E%3D18-339933?logo=node.js&logoColor=white)
 
+**English** · [Español](README.es.md)
+
 **Your agent is only as good as the harness around it.**
 
 This skill analyzes your JS/TS project, audits the 7 harness layers, and generates what’s missing — one layer at a time, with a diff and your “yes” before anything is written.
 
 Works with [Agent Skills](https://agentskills.io) · [skills.sh](https://skills.sh) · Claude Code · Cursor
-
-[Español ↓](#español)
 
 ---
 
@@ -125,48 +125,6 @@ node --test skills/harness-recipe/scripts/references.test.mjs
 node skills/harness-recipe/scripts/detect.mjs /path/to/project
 npx skills add . -l
 ```
-
----
-
-## Español
-
-**Tu agente es tan bueno como el harness que lo rodea.**
-
-Este skill analiza tu proyecto JS/TS, audita las 7 capas del harness y genera lo que falte — una capa a la vez, con diff y tu “sí” antes de tocar nada.
-
-### Instalar
-
-```bash
-npx skills add oscaroceguera/harness-recipe
-```
-
-```bash
-# Global (todos tus proyectos)
-npx skills add oscaroceguera/harness-recipe -g
-
-# Solo listar
-npx skills add oscaroceguera/harness-recipe -l
-```
-
-### Cómo funciona
-
-1. **Analiza** — `detect.mjs` escanea el repo (solo lectura).
-2. **Audita** — reporte en inglés, tabla por capa, arreglo concreto por cada ❌.
-3. **Genera** — una capa a la vez; muestra el diff; espera tu OK; luego escribe.
-
-Nada se escribe sin tu aprobación.
-
-### Cómo pedirlo
-
-```text
-Audita el harness de este proyecto.
-¿Qué le falta a mi setup de Claude Code?
-Genera la capa de permisos.
-Genera los hooks.
-Audita mis microfrontends.
-```
-
-Las instrucciones del skill y los reportes de auditoría están en **inglés** por defecto.
 
 ---
 
