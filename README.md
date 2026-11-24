@@ -1,10 +1,31 @@
 # harness-recipe
 
-Lleva la Harness Recipe a cualquier proyecto JS/TS. El skill **analiza** el proyecto (gestor de paquetes, topología, qué harness ya existe), lo **audita** sin tocar nada y **genera** lo que falte, una capa a la vez: te muestra el diff y espera tu "sí".
+Skill que lleva la **Harness Recipe** a cualquier proyecto JS/TS: analiza el repo, audita las 7 capas del harness sin tocar nada y genera lo que falte, una capa a la vez (te muestra el diff y espera tu "sí").
 
-Las 7 capas: sensores y scripts · contexto (CLAUDE.md y rules) · permisos · hooks · git hooks y commits · tools (MCP) · observabilidad.
+Compatible con el ecosistema abierto de [Agent Skills](https://agentskills.io) / [skills.sh](https://skills.sh).
 
-> Este README es para ti. Claude lee `SKILL.md`.
+## Instalar
+
+En el proyecto donde quieras usarlo:
+
+```bash
+npx skills add oscaroceguera/harness-recipe
+```
+
+Opciones útiles:
+
+```bash
+# Solo este skill (si el repo crece)
+npx skills add oscaroceguera/harness-recipe --skill harness-recipe
+
+# Global (todos tus proyectos)
+npx skills add oscaroceguera/harness-recipe -g
+
+# Listar sin instalar
+npx skills add oscaroceguera/harness-recipe -l
+```
+
+Funciona con Claude Code, Cursor y otros agentes que lean skills en `.agents/skills/`, `.claude/skills/` o `.cursor/skills/`.
 
 ## Cómo pedirlo
 
@@ -14,18 +35,13 @@ Las 7 capas: sensores y scripts · contexto (CLAUDE.md y rules) · permisos · h
 - "Genera los hooks."
 - "Audita mis microfrontends."
 
-## Qué obtienes
+## Qué hace
 
-Un reporte en español con una tabla por capa. Ejemplo (de una auditoría real de `calculator-harness`):
+1. **Analiza** — corre `detect.mjs` (solo lectura) y resume topología, package manager y harness existente.
+2. **Audita** — reporte en español, tabla por capa con ✅/⚠️/❌ y el arreglo concreto.
+3. **Genera** — una capa a la vez, con diff y confirmación antes de escribir.
 
-| Item | Estado | Por qué importa | Arreglo |
-|------|--------|-----------------|---------|
-| Rule `performance.md` | ❌ | `paths: app/**` no coincide con `src/app/`, así que nunca se carga | Cambiar a `src/app/**` |
-| Git usa `.githooks` | ❌ | `core.hooksPath` sin configurar: `commit-msg` nunca corre | `pnpm run prepare` |
-| Hooks y gestor | ❌ | Los hooks llaman a `npm` en un proyecto `pnpm` | Regenerar con `{{run}}` → `pnpm --silent run` |
-| `SessionStart` matcher | ⚠️ | Sin `clear`, `/clear` arranca sin el estado del proyecto | `startup\|resume\|clear` |
-
-Al final viene "Siguiente paso": las capas en orden, primero las que tienen ❌. Si quieres, lo guarda en `docs/harness-audit.md`.
+Las 7 capas: sensores y scripts · contexto (CLAUDE.md y rules) · permisos · hooks · git hooks y commits · tools (MCP) · observabilidad.
 
 ## Qué soporta
 
@@ -39,22 +55,37 @@ Al final viene "Siguiente paso": las capas en orden, primero las que tienen ❌.
 
 Si el proyecto no está soportado, el reporte lo dice en vez de adivinar.
 
-## Qué hay dentro
+## Estructura del paquete
 
 ```text
-SKILL.md                          flujo que sigue Claude: analizar → auditar → generar
-scripts/detect.mjs                escanea el repo (solo lectura) e imprime un JSON
-scripts/detect.test.mjs           tests de detect.mjs
-references/layers/                una ficha por capa: qué auditar, qué generar, cómo probarlo
-references/topologies/            app sola, Turborepo/workspaces, Module Federation
-references/audit-report-template.md
-assets/templates/                 configs con variables; dot-claude/ se copia como .claude/ (hooks, settings, rules, improve-harness, feature-workflow)
-evals/evals.json                  casos para evaluar el skill
+skills/harness-recipe/
+  SKILL.md                 # instrucciones del agente
+  scripts/detect.mjs       # escaneo de solo lectura → JSON
+  references/              # fichas por capa y topología
+  assets/templates/        # plantillas con {{placeholders}}
+  evals/                   # casos de evaluación del skill
 ```
 
-## Mantenimiento
+Las plantillas bajo `assets/templates/dot-claude/skills/` (`feature-workflow`, `improve-harness`) **no** se instalan como skills del paquete: se copian al proyecto destino solo si generas esas capas.
 
-- Las plantillas de `assets/templates/` salen de la receta en Obsidian (`05 Planning/Harness Recipe/`). Los valores fijos (`npm`, `5173`, `src/`) son variables como `{{pm}}`, `{{run}}`, `{{src}}` y `{{port}}`. La tabla completa está en `SKILL.md`.
-- Si cambias la receta, copia el archivo a `assets/templates/` y vuelve a poner las variables.
-- Tests: `node --test scripts/detect.test.mjs`
-- Ver qué detecta en un repo: `node scripts/detect.mjs <ruta-del-repo>`
+## Seguridad
+
+- `scripts/detect.mjs` solo lee el filesystem e imprime JSON; no escribe ni ejecuta el proyecto.
+- La generación de archivos ocurre solo en el paso 3, después de que apruebes el diff de cada capa.
+- Revisa el skill antes de instalarlo, como cualquier código de terceros.
+
+## Desarrollo
+
+```bash
+# Tests del detector
+node --test skills/harness-recipe/scripts/detect.test.mjs
+node --test skills/harness-recipe/scripts/references.test.mjs
+
+# Probar detección contra un repo
+node skills/harness-recipe/scripts/detect.mjs /ruta/al/proyecto
+
+# Validar discovery local
+npx skills add . -l
+```
+
+Licencia: [MIT](./LICENSE).
