@@ -1,17 +1,17 @@
 ---
 name: harness-recipe
 description: >-
-  Audits and generates a Claude Code + Cursor agent harness (AGENTS.md,
-  CLAUDE.md, rules, permissions, hooks, git hooks, MCP tools, observability)
-  for JS/TS projects. Use when setting up or improving agent tooling, auditing
-  what a project's harness is missing, generating permissions or hooks, making
-  rules survive Claude↔Cursor switches, or working with Turborepo, pnpm/npm/yarn/bun
-  workspaces, or Module Federation.
+  Use when setting up or improving Claude Code / Cursor agent tooling in a
+  JS/TS project; auditing what a harness is missing (AGENTS.md, CLAUDE.md,
+  rules, permissions, hooks, git hooks, MCP, observability); generating
+  permissions or hooks; making rules survive Claude↔Cursor switches; or
+  working with Turborepo, pnpm/npm/yarn/bun workspaces, or Module Federation.
+  Prefer this over ad-hoc harness edits whenever those gaps appear.
 license: MIT
 compatibility: Requires Node.js 18+ to run the bundled detect.mjs scanner.
 metadata:
   author: oscaroceguera
-  version: "1.1.0"
+  version: "1.1.1"
 model: sonnet
 ---
 
