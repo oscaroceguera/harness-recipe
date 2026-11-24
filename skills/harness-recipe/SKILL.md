@@ -59,7 +59,7 @@ Then, for each layer in order, load its file and evaluate every row of its `## A
 6. `references/layers/06-tools.md`
 7. `references/layers/07-observability.md`
 
-Fill `references/audit-report-template.md` in Spanish: one table row per audit row, with ✅/⚠️/❌, why it matters, and the concrete fix. Add the topology rows. Order "Siguiente paso" by layer, ❌ first.
+Fill `references/audit-report-template.md` in English: one table row per audit row, with ✅/⚠️/❌, why it matters, and the concrete fix. Add the topology rows. Order "Next step" by layer, ❌ first.
 
 The audit is read-only: show the report in the conversation. Offer to save it as `docs/harness-audit.md`; write it only if the user says yes.
 

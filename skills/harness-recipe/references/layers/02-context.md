@@ -31,7 +31,7 @@ What the agent knows before it acts. Guidance, not enforcement. Keep root `CLAUD
 
 ## Session habits (for the user, not the agent)
 
-Slash commands are typed by the user; putting them in CLAUDE.md costs context and the agent cannot run them. The audit report carries them in its "Hábitos de sesión" section.
+Slash commands are typed by the user; putting them in CLAUDE.md costs context and the agent cannot run them. The audit report carries them in its "Session habits" section.
 
 ## Prove it works
 

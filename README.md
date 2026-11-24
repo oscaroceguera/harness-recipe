@@ -4,27 +4,29 @@
 [![GitHub stars](https://img.shields.io/github/stars/oscaroceguera/harness-recipe?style=social)](https://github.com/oscaroceguera/harness-recipe)
 ![Node 18+](https://img.shields.io/badge/node-%3E%3D18-339933?logo=node.js&logoColor=white)
 
-**Tu agente es tan bueno como el harness que lo rodea.**
+**Your agent is only as good as the harness around it.**
 
-Este skill analiza tu proyecto JS/TS, audita las 7 capas del harness y genera lo que falte — una capa a la vez, con diff y tu “sí” antes de tocar nada.
+This skill analyzes your JS/TS project, audits the 7 harness layers, and generates what’s missing — one layer at a time, with a diff and your “yes” before anything is written.
 
-Compatible con [Agent Skills](https://agentskills.io) · [skills.sh](https://skills.sh) · Claude Code · Cursor
+Works with [Agent Skills](https://agentskills.io) · [skills.sh](https://skills.sh) · Claude Code · Cursor
+
+[Español ↓](#español)
 
 ---
 
 ## Install
 
-Requiere Node.js 18+ (para el scanner `detect.mjs`).
+Requires Node.js 18+ (for the `detect.mjs` scanner).
 
 ```bash
 npx skills add oscaroceguera/harness-recipe
 ```
 
 ```bash
-# Global (todos tus proyectos)
+# Global (all your projects)
 npx skills add oscaroceguera/harness-recipe -g
 
-# Solo listar
+# List only
 npx skills add oscaroceguera/harness-recipe -l
 ```
 
@@ -41,11 +43,11 @@ npx skills add oscaroceguera/harness-recipe -l
 
 | Step | What happens |
 |------|----------------|
-| **1. Analyze** | `detect.mjs` escanea el repo (solo lectura): package manager, topología, harness existente |
-| **2. Audit** | Reporte en español, tabla por capa, arreglo concreto por cada ❌ |
-| **3. Generate** | Una capa a la vez. Te muestra el diff. Espera tu OK. Luego escribe |
+| **1. Analyze** | `detect.mjs` scans the repo (read-only): package manager, topology, existing harness |
+| **2. Audit** | English report, table per layer, concrete fix for every ❌ |
+| **3. Generate** | One layer at a time. Shows the diff. Waits for your OK. Then writes |
 
-Nada se escribe sin tu aprobación.
+Nothing is written without your approval.
 
 ---
 
@@ -54,25 +56,25 @@ Nada se escribe sin tu aprobación.
 ```text
 ① sensors        scripts, lint, typecheck, tests
 ② context        CLAUDE.md / AGENTS.md + rules
-③ permissions    allow / deny en settings
+③ permissions    allow / deny in settings
 ④ hooks          SessionStart, PreToolUse, …
 ⑤ git hooks      commit-msg, pre-push, commitlint
 ⑥ tools          MCP (.mcp.json)
 ⑦ observability  improve-harness + review checklist
 ```
 
-La regla de oro: un **hecho** va en CLAUDE.md o una rule · un **límite** en deny · un **check** en hook, lint o test.
+Golden rule: a **fact** goes in CLAUDE.md or a rule · a **limit** in deny · a **check** in a hook, lint rule, or test.
 
 ---
 
 ## Try saying
 
 ```text
-Audita el harness de este proyecto.
-¿Qué le falta a mi setup de Claude Code?
-Genera la capa de permisos.
-Genera los hooks.
-Audita mis microfrontends.
+Audit the harness of this project.
+What is my Claude Code setup missing?
+Generate the permissions layer.
+Generate the hooks.
+Audit my microfrontends.
 ```
 
 ---
@@ -81,13 +83,13 @@ Audita mis microfrontends.
 
 | ✅ Yes | ❌ Not yet |
 |--------|------------|
-| Next.js, Vite, Node, libs JS/TS | Python, Go, … |
+| Next.js, Vite, Node, JS/TS libs | Python, Go, … |
 | Single app | React Native |
 | Turborepo · pnpm / npm / yarn / bun workspaces | Nx |
 | Module Federation (host + remotes) | Vercel Microfrontends |
 | Normal clone · `--bare` · worktrees | CI pipelines |
 
-Unsupported stack → el reporte lo dice. No inventa.
+Unsupported stack → the report says so. It does not guess.
 
 ---
 
@@ -102,15 +104,15 @@ skills/harness-recipe/
 └── evals/                # skill eval cases
 ```
 
-`feature-workflow` e `improve-harness` viven en templates: se copian al proyecto solo si generas esas capas. No se instalan como skills del paquete.
+`feature-workflow` and `improve-harness` live in templates: they are copied into the target project only if you generate those layers. They are not installed as package skills.
 
 ---
 
 ## Safety
 
-- `detect.mjs` **solo lee**. Imprime JSON. No escribe ni ejecuta tu app.
-- La generación es el paso 3, **después** de que apruebes el diff.
-- Trátalo como código de terceros: léelo antes de instalar.
+- `detect.mjs` is **read-only**. It prints JSON. It does not write or run your app.
+- Generation is step 3, **after** you approve the diff.
+- Treat it like third-party code: read it before installing.
 
 ---
 
@@ -123,6 +125,48 @@ node --test skills/harness-recipe/scripts/references.test.mjs
 node skills/harness-recipe/scripts/detect.mjs /path/to/project
 npx skills add . -l
 ```
+
+---
+
+## Español
+
+**Tu agente es tan bueno como el harness que lo rodea.**
+
+Este skill analiza tu proyecto JS/TS, audita las 7 capas del harness y genera lo que falte — una capa a la vez, con diff y tu “sí” antes de tocar nada.
+
+### Instalar
+
+```bash
+npx skills add oscaroceguera/harness-recipe
+```
+
+```bash
+# Global (todos tus proyectos)
+npx skills add oscaroceguera/harness-recipe -g
+
+# Solo listar
+npx skills add oscaroceguera/harness-recipe -l
+```
+
+### Cómo funciona
+
+1. **Analiza** — `detect.mjs` escanea el repo (solo lectura).
+2. **Audita** — reporte en inglés, tabla por capa, arreglo concreto por cada ❌.
+3. **Genera** — una capa a la vez; muestra el diff; espera tu OK; luego escribe.
+
+Nada se escribe sin tu aprobación.
+
+### Cómo pedirlo
+
+```text
+Audita el harness de este proyecto.
+¿Qué le falta a mi setup de Claude Code?
+Genera la capa de permisos.
+Genera los hooks.
+Audita mis microfrontends.
+```
+
+Las instrucciones del skill y los reportes de auditoría están en **inglés** por defecto.
 
 ---
 

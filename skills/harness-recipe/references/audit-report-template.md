@@ -1,46 +1,46 @@
-# Auditoría del harness — {{projectName}}
+# Harness audit — {{projectName}}
 
-**Topología:** {{topology}} ({{monorepoTool}}) · **Gestor:** {{pm}} · **Paquetes:** {{packagesSummary}}
-{{unsupportedNote}}  <!-- solo si supported:false o algo no soportado: dilo y no adivines -->
+**Topology:** {{topology}} ({{monorepoTool}}) · **Package manager:** {{pm}} · **Packages:** {{packagesSummary}}
+{{unsupportedNote}}  <!-- only when supported:false or something unsupported: say so and do not guess -->
 
-Leyenda: ✅ listo · ⚠️ funciona pero mejorable · ❌ falta o roto
+Legend: ✅ ready · ⚠️ works but improvable · ❌ missing or broken
 
-## 1. Sensores y scripts
-| Item | Estado | Por qué importa | Arreglo |
-|------|--------|-----------------|---------|
+## 1. Sensors and scripts
+| Item | Status | Why it matters | Fix |
+|------|--------|----------------|-----|
 
-## 2. Contexto (CLAUDE.md y rules)
-| Item | Estado | Por qué importa | Arreglo |
-|------|--------|-----------------|---------|
+## 2. Context (CLAUDE.md and rules)
+| Item | Status | Why it matters | Fix |
+|------|--------|----------------|-----|
 
-## 3. Permisos
-| Item | Estado | Por qué importa | Arreglo |
-|------|--------|-----------------|---------|
+## 3. Permissions
+| Item | Status | Why it matters | Fix |
+|------|--------|----------------|-----|
 
 ## 4. Hooks
-| Item | Estado | Por qué importa | Arreglo |
-|------|--------|-----------------|---------|
+| Item | Status | Why it matters | Fix |
+|------|--------|----------------|-----|
 
-## 5. Git hooks y commits
-| Item | Estado | Por qué importa | Arreglo |
-|------|--------|-----------------|---------|
+## 5. Git hooks and commits
+| Item | Status | Why it matters | Fix |
+|------|--------|----------------|-----|
 
 ## 6. Tools
-| Item | Estado | Por qué importa | Arreglo |
-|------|--------|-----------------|---------|
+| Item | Status | Why it matters | Fix |
+|------|--------|----------------|-----|
 
-## 7. Observabilidad
-| Item | Estado | Por qué importa | Arreglo |
-|------|--------|-----------------|---------|
+## 7. Observability
+| Item | Status | Why it matters | Fix |
+|------|--------|----------------|-----|
 
-## Topología: {{topology}}
-<!-- filas extra de la referencia de topología (puertos, shared de Module Federation, rules sin paths en monorepo…) -->
+## Topology: {{topology}}
+<!-- extra rows from the topology reference (ports, Module Federation shared, monorepo rules without paths…) -->
 
-## Siguiente paso
-<!-- capas en el orden de la receta (1→7); primero las que tienen ❌. Una línea por capa: qué generar. -->
+## Next step
+<!-- layers in recipe order (1→7); ❌ first. One line per layer: what to generate. -->
 
-## Hábitos de sesión (para ti, no para el agente)
-- `/context` cuando la sesión vaya lenta: muestra qué ocupa el contexto (CLAUDE.md, rules, MCP, conversación).
-- `/compact <qué conservar>` al terminar una subtarea y antes de empezar la siguiente.
-- `/clear` al cambiar a trabajo no relacionado; antes, `/rename` para poder volver con `/resume`.
-- `/mcp` para apagar servidores que esta tarea no usa.
+## Session habits (for you, not the agent)
+- `/context` when the session feels slow: shows what is using context (CLAUDE.md, rules, MCP, conversation).
+- `/compact <what to keep>` after finishing a subtask and before starting the next one.
+- `/clear` when switching to unrelated work; `/rename` first so you can `/resume` later.
+- `/mcp` to turn off servers this task does not need.

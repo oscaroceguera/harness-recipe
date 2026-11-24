@@ -3,9 +3,9 @@
   "cases": [
     {
       "id": "audit-next-single",
-      "prompt": "audita el harness de este proyecto y dime qué me falta",
+      "prompt": "audit the harness of this project and tell me what I'm missing",
       "fixture": "Next.js app with src/app, pnpm-lock.yaml, a pnpm-workspace.yaml holding only onlyBuiltDependencies, no .claude/ folder",
-      "expected_output": "A Spanish audit report with a table per layer, the project identified as a single pnpm Next.js app, and no file changes.",
+      "expected_output": "An English audit report with a table per layer, the project identified as a single pnpm Next.js app, and no file changes.",
       "assertions": [
         "detect.mjs was run before any judgment",
         "Topology reported as single (the pnpm-workspace.yaml without packages: is not treated as a monorepo)",
@@ -28,7 +28,7 @@
     },
     {
       "id": "generate-permissions-turborepo",
-      "prompt": "genera la capa de permisos para este monorepo",
+      "prompt": "generate the permissions layer for this monorepo",
       "fixture": "Turborepo + pnpm with apps/web (next, port 3000) and apps/admin (next, port 3001), no .claude/settings.json",
       "expected_output": "A diff for one root .claude/settings.json, shown before writing, with pnpm patterns and turbo allows.",
       "assertions": [
@@ -54,7 +54,7 @@
     },
     {
       "id": "analyze-from-symlinked-skill",
-      "prompt": "audita el harness de este proyecto",
+      "prompt": "audit the harness of this project",
       "fixture": "Next.js + pnpm single app where the skill is installed as a symlink: .claude/skills/harness-recipe -> .agents/skills/harness-recipe",
       "expected_output": "Step 1 runs detect.mjs through the symlinked path and gets the JSON Report; the audit continues from it.",
       "assertions": [
@@ -65,7 +65,7 @@
     },
     {
       "id": "audit-context-budget",
-      "prompt": "mi sesión de Claude se queda sin contexto muy rápido, audita el harness",
+      "prompt": "my Claude session runs out of context too fast, audit the harness",
       "fixture": "Next.js + pnpm single app, 320-line CLAUDE.md with a numbered deploy procedure, no '# Compact instructions', a rule without paths, PreToolUse only guard-commands.sh",
       "expected_output": "Layer 2 flags size, missing compact instructions and the procedure; layer 4 flags untrimmed test output; report ends with session habits.",
       "assertions": [
@@ -73,7 +73,7 @@
         "Compact instructions row is ❌ and the fix uses the exact heading '# Compact instructions'",
         "The deploy procedure is proposed to move to a skill, not to an @import",
         "Layer 4 'Test output trimmed' row is ⚠️ and names filter-test-output.sh",
-        "The report contains the 'Hábitos de sesión' section with /context, /compact and /clear"
+        "The report contains the 'Session habits' section with /context, /compact and /clear"
       ]
     }
   ]
