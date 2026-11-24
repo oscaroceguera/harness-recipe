@@ -1,0 +1,11 @@
+node_modules
+dist
+.next
+out
+next-env.d.ts
+*.tsbuildinfo
+*.local
+.claude/settings.local.json
+.playwright-cli/
+test-results/
+.superpowers/
