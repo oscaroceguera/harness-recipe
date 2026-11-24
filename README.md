@@ -1,5 +1,9 @@
 # harness-recipe
 
+[![License: MIT](https://img.shields.io/github/license/oscaroceguera/harness-recipe)](LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/oscaroceguera/harness-recipe?style=social)](https://github.com/oscaroceguera/harness-recipe)
+![Node 18+](https://img.shields.io/badge/node-%3E%3D18-339933?logo=node.js&logoColor=white)
+
 **Tu agente es tan bueno como el harness que lo rodea.**
 
 Este skill analiza tu proyecto JS/TS, audita las 7 capas del harness y genera lo que falte — una capa a la vez, con diff y tu “sí” antes de tocar nada.
@@ -9,6 +13,8 @@ Compatible con [Agent Skills](https://agentskills.io) · [skills.sh](https://ski
 ---
 
 ## Install
+
+Requiere Node.js 18+ (para el scanner `detect.mjs`).
 
 ```bash
 npx skills add oscaroceguera/harness-recipe
