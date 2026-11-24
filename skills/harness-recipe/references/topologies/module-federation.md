@@ -4,7 +4,7 @@ A package with `moduleFederation != null`. `role` is `host` (has `remotes`), `re
 
 ## Treat each as an app
 
-- Host and every remote get the full single-app harness (or a nested `CLAUDE.md` in a monorepo).
+- Host and every remote get the full single-app harness (or nested `AGENTS.md` / thin `CLAUDE.md` in a monorepo).
 - Each has its own dev port; e2e for the host must start (or reuse) the remotes it loads. `playwright.config.ts` `webServer` becomes an array: host plus each remote.
 - `session-start.sh` checks every port.
 

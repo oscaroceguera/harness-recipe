@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-# PreToolUse(Bash): block commands that skip checks, rewrite history, leak secrets or use the wrong package manager.
+# PreToolUse(Bash) / beforeShellExecution: block commands that skip checks, rewrite history, leak secrets or use the wrong package manager.
 # Exit 2 + stderr reaches the agent; exit 0 lets the command run.
-raw=$(jq -r '.tool_input.command // empty')
+# Accepts Claude (.tool_input.command) and Cursor native (.command) stdin shapes.
+raw=$(jq -r '.tool_input.command // .command // empty')
 [ -z "$raw" ] && exit 0
 
 # Match only what runs, not prose: drop heredoc bodies, then quoted -m/--message/--title/--body values.

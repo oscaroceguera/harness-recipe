@@ -1,16 +1,17 @@
 ---
 name: harness-recipe
 description: >-
-  Audits and generates a Claude Code / agent harness (CLAUDE.md, rules,
-  permissions, hooks, git hooks, MCP tools, observability) for JS/TS projects.
-  Use when setting up or improving agent tooling, auditing what a project's
-  harness is missing, generating permissions or hooks, or working with
-  Turborepo, pnpm/npm/yarn/bun workspaces, or Module Federation.
+  Audits and generates a Claude Code + Cursor agent harness (AGENTS.md,
+  CLAUDE.md, rules, permissions, hooks, git hooks, MCP tools, observability)
+  for JS/TS projects. Use when setting up or improving agent tooling, auditing
+  what a project's harness is missing, generating permissions or hooks, making
+  rules survive Claude↔Cursor switches, or working with Turborepo, pnpm/npm/yarn/bun
+  workspaces, or Module Federation.
 license: MIT
 compatibility: Requires Node.js 18+ to run the bundled detect.mjs scanner.
 metadata:
   author: oscaroceguera
-  version: "1.0.0"
+  version: "1.1.0"
 model: sonnet
 ---
 
@@ -18,7 +19,9 @@ model: sonnet
 
 A harness is the environment around the agent, in 7 **layers**: sensors, context, permissions, hooks, git hooks, tools, observability. This skill fits the recipe to the project in front of you: it reads the project first, audits each layer, then generates what is missing, one layer at a time.
 
-The guiding rule for every gap: a missing **fact** goes in CLAUDE.md or a rule, a missing **limit** in a deny rule, a missing **check** in a hook, lint rule or test.
+It targets **Claude Code and Cursor together**: shared facts in `AGENTS.md`, thin `CLAUDE.md` with `@AGENTS.md`, mirrored rules under `.claude/rules/` and `.cursor/rules/`, Claude hooks (imported by Cursor via Third-Party Imports) plus Cursor-native gaps such as `beforeReadFile`.
+
+The guiding rule for every gap: a missing **fact** goes in AGENTS.md or a rule, a missing **limit** in a deny rule or Cursor read hook, a missing **check** in a hook, lint rule or test.
 
 Paths below are relative to this skill's folder.
 
@@ -30,9 +33,9 @@ Run the scan from the project root:
 node <this-skill>/scripts/detect.mjs .
 ```
 
-It prints the **Report** (JSON): package manager, topology, packages (framework, `srcDir`, port, scripts, Module Federation role), and the existing harness. It reads files only.
+It prints the **Report** (JSON): package manager, topology, packages (framework, `srcDir`, port, scripts, Module Federation role), and the existing harness (Claude + Cursor). It reads files only.
 
-Summarize the Report for the user in at most 10 lines: topology, package manager, each package with framework and port, and which harness pieces exist.
+Summarize the Report for the user in at most 10 lines: topology, package manager, each package with framework and port, and which harness pieces exist (including `AGENTS.md`, `.cursor/rules`, `.cursor/hooks.json`).
 
 - `supported: false` → tell the user the `unsupportedReason` and stop. Offer only the parts that still apply (for example permissions and git hooks), clearly labeled.
 - Topology unclear (for example a workspace with one package, or a federation role `unknown`) → ask the user one question before going on.
@@ -69,11 +72,11 @@ Done when every audit row of all 7 layers and the topology reference has a state
 
 Ask which layers to generate (default: every layer with ❌, in layer order). For each chosen layer:
 
-1. Read its `## Generate` section and the templates it names in `assets/templates/`. Templates under `assets/templates/dot-claude/` go to the project's `.claude/` (the folder is renamed so `.gitignore` rules for `.claude` and skill installers that skip dot-folders keep it).
+1. Read its `## Generate` section and the templates it names in `assets/templates/`. Templates under `assets/templates/dot-claude/` go to the project's `.claude/`; templates under `assets/templates/dot-cursor/` go to the project's `.cursor/` (folders are renamed so `.gitignore` rules for those dirs and skill installers that skip dot-folders keep them).
 2. Fill the placeholders (table below) and apply the topology reference's changes.
-3. Show the user each file as a diff against what exists today. Merge into existing files (`settings.json`, `package.json`, `.gitignore`); keep the user's content.
+3. Show the user each file as a diff against what exists today. Merge into existing files (`settings.json`, `hooks.json`, `package.json`, `.gitignore`); keep the user's content.
 4. Wait for a yes. Then write the files. Hooks and git hooks: `chmod +x`.
-5. Run the layer's `## Prove it works` checks that can run from the shell, and report the output. List the ones that need a live Claude session for the user to try.
+5. Run the layer's `## Prove it works` checks that can run from the shell, and report the output. List the ones that need a live Claude or Cursor session for the user to try.
 
 Done with a layer when its checks ran and the user has the results. Then move to the next layer.
 
@@ -99,5 +102,7 @@ Every generated file is free of `{{` when written: check with `grep -rn '{{' <fi
 - Write files only in step 3, only after the user approves that layer's diff.
 - Personal files stay personal: `.claude/settings.local.json` and `.env*` are never created, copied, or read.
 - Project-specific rules (structure, performance) are written from the project's real folders, never copied from the recipe.
+- When generating rules, write **both** `.claude/rules/*.md` and matching `.cursor/rules/*.mdc` in the same step so Claude ↔ Cursor switches keep the same guidance.
+- Do not duplicate Claude PreToolUse/Stop hooks into `.cursor/hooks.json` while Cursor Third-Party Imports loads `.claude/settings.json` (double fire). Cursor `hooks.json` is for native gaps only.
 - Reuse the user's skills: `create-agentsmd` for a missing CLAUDE.md/AGENTS.md, `conventional-commits` for commit messages.
 - Outside the supported stacks (JS/TS; single, workspaces/Turborepo, Module Federation), say so plainly in the report.

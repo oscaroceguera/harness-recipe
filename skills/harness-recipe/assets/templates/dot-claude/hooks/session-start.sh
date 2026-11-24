@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # SessionStart: print project state so the agent starts with facts, not guesses.
-cd "${CLAUDE_PROJECT_DIR:-.}" || exit 0
+cd "${CLAUDE_PROJECT_DIR:-${CURSOR_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}}" || exit 0
 
 # 1. Git state
 branch=$(git branch --show-current 2>/dev/null)

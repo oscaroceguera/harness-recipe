@@ -4,12 +4,13 @@
     {
       "id": "audit-next-single",
       "prompt": "audit the harness of this project and tell me what I'm missing",
-      "fixture": "Next.js app with src/app, pnpm-lock.yaml, a pnpm-workspace.yaml holding only onlyBuiltDependencies, no .claude/ folder",
+      "fixture": "Next.js app with src/app, pnpm-lock.yaml, a pnpm-workspace.yaml holding only onlyBuiltDependencies, no .claude/ or .cursor/ folder",
       "expected_output": "An English audit report with a table per layer, the project identified as a single pnpm Next.js app, and no file changes.",
       "assertions": [
         "detect.mjs was run before any judgment",
         "Topology reported as single (the pnpm-workspace.yaml without packages: is not treated as a monorepo)",
         "Every layer 1-7 has a table with ✅/⚠️/❌ rows and a concrete fix for each ❌",
+        "Layer 2 flags missing AGENTS.md / Cursor rule mirrors when absent",
         "Suggested commands use pnpm, never npm",
         "No file in the project was created or modified (git status unchanged)"
       ]
@@ -66,14 +67,29 @@
     {
       "id": "audit-context-budget",
       "prompt": "my Claude session runs out of context too fast, audit the harness",
-      "fixture": "Next.js + pnpm single app, 320-line CLAUDE.md with a numbered deploy procedure, no '# Compact instructions', a rule without paths, PreToolUse only guard-commands.sh",
-      "expected_output": "Layer 2 flags size, missing compact instructions and the procedure; layer 4 flags untrimmed test output; report ends with session habits.",
+      "fixture": "Next.js + pnpm single app, 320-line CLAUDE.md with a numbered deploy procedure, no AGENTS.md, no '# Compact instructions', a rule without paths, PreToolUse only guard-commands.sh, no .cursor/rules",
+      "expected_output": "Layer 2 flags size, missing AGENTS bridge / Cursor mirrors, missing compact instructions and the procedure; layer 4 flags untrimmed test output; report ends with session habits.",
       "assertions": [
         "Size row is ❌ (> 300 lines)",
+        "Shared root context / Claude import rows flag missing AGENTS.md or missing @AGENTS.md",
+        "Cursor rule mirrors row is ❌ when .cursor/rules is empty",
         "Compact instructions row is ❌ and the fix uses the exact heading '# Compact instructions'",
         "The deploy procedure is proposed to move to a skill, not to an @import",
         "Layer 4 'Test output trimmed' row is ⚠️ and names filter-test-output.sh",
         "The report contains the 'Session habits' section with /context, /compact and /clear"
+      ]
+    },
+    {
+      "id": "generate-context-dual-cursor",
+      "prompt": "generate the context layer so rules work in both Claude Code and Cursor",
+      "fixture": "Next.js + pnpm single app with a fat CLAUDE.md only, no AGENTS.md, one .claude/rules/tests.md with paths, no .cursor/rules",
+      "expected_output": "A diff that extracts shared content to AGENTS.md, thins CLAUDE.md with @AGENTS.md, and adds matching .cursor/rules/*.mdc mirrors before writing.",
+      "assertions": [
+        "A diff is shown and the skill waits for approval before writing",
+        "AGENTS.md is created with Project/Commands from the project",
+        "CLAUDE.md keeps @AGENTS.md and # Compact instructions without duplicating Commands",
+        "A .cursor/rules/tests.mdc mirror is proposed with globs matching the Claude paths",
+        "No rewrite of unrelated user prose outside the proposed diff"
       ]
     }
   ]

@@ -2,16 +2,17 @@
 
 Each entry: symptom, causes, and a check you can run yourself.
 
-## An instruction in CLAUDE.md or a rule is ignored
+## An instruction in AGENTS.md, CLAUDE.md or a rule is ignored
 
-- File is too long. Check: `wc -l CLAUDE.md`. Over 200 lines: move folder rules to `.claude/rules/`.
-- Another file says the opposite. Check: `grep -rn "<word>" CLAUDE.md .claude/ ~/.claude/CLAUDE.md`. Keep one version.
+- File is too long. Check: `wc -l AGENTS.md CLAUDE.md`. Over 200 lines in the always-loaded set: move folder rules to `.claude/rules/` and mirror `.cursor/rules/`.
+- Claude and Cursor drifted. Check: shared facts live in `AGENTS.md`, `CLAUDE.md` has `@AGENTS.md`, and each `.claude/rules/*.md` has a matching `.cursor/rules/*.mdc`.
+- Another file says the opposite. Check: `grep -rn "<word>" AGENTS.md CLAUDE.md .claude/ .cursor/ ~/.claude/CLAUDE.md`. Keep one version.
 - Wording is vague ("try to", "prefer", "if possible"). Fix: one clear action per line.
 - It points to a moved or deleted path. Check: open every path it mentions.
 
 ## Context fills up fast
 
-- Always-loaded set is large. Check: `/context`; `wc -l CLAUDE.md`; rules in `.claude/rules/` without `paths`.
+- Always-loaded set is large. Check: `/context`; `wc -l AGENTS.md CLAUDE.md`; Claude rules without `paths`; Cursor rules with `alwaysApply: true`.
 - Test runs print everything. Check: `PreToolUse` hooks in `.claude/settings.json` include `filter-test-output.sh`.
 - Unused MCP servers. Check: `/mcp`.
 - Many full-page screenshots. Fix: snapshots (text) and element screenshots.
@@ -20,9 +21,11 @@ Each entry: symptom, causes, and a check you can run yourself.
 
 - Not listed under `# Compact instructions` in CLAUDE.md. Fix: add it to the keep list.
 
-## CLAUDE.md does not load
+## CLAUDE.md / AGENTS.md does not load
 
-- Wrong name or place. Check: `ls CLAUDE.md .claude/CLAUDE.md`.
+- Wrong name or place. Check: `ls AGENTS.md CLAUDE.md .claude/CLAUDE.md`.
+- Cursor session: confirm `AGENTS.md` exists at the repo root (Cursor does not load a fat `CLAUDE.md` as shared project rules).
+- Claude has `CLAUDE.md` but no `@AGENTS.md` while facts live only in `AGENTS.md`: Claude may ignore the shared file.
 
 ## A rule does not apply to its files
 

@@ -109,7 +109,8 @@ test("harness-full is reflected", () => {
   const root = make({
     "package.json": nextPkg(),
     "pnpm-lock.yaml": "",
-    "CLAUDE.md": "# x",
+    "AGENTS.md": "# shared",
+    "CLAUDE.md": "# x\n\n@AGENTS.md\n",
     "apps/CLAUDE.md": "# nested",
     ".claude/rules/perf.md": '---\npaths:\n  - "src/app/**"\n---\n# Perf\n',
     ".claude/rules/global.md": "# Global\n",
@@ -120,22 +121,44 @@ test("harness-full is reflected", () => {
     },
     ".claude/hooks/check-all.sh": "#!/bin/sh\n",
     ".claude/skills/improve-harness/SKILL.md": "x",
+    ".cursor/rules/tests.mdc": '---\ndescription: Tests\nglobs: "**/*.spec.ts"\nalwaysApply: false\n---\n# Tests\n',
+    ".cursor/rules/global.mdc": "---\nalwaysApply: true\n---\n# Global\n",
+    ".cursor/hooks.json": { version: 1, hooks: { beforeReadFile: [], stop: [] } },
+    ".cursor/hooks/deny-env-read.sh": "#!/bin/sh\n",
     ".githooks/pre-push": "#!/bin/sh\n",
     ".git/config": "[core]\n\thooksPath = .githooks\n",
     "commitlint.config.js": "",
     ".mcp.json": { mcpServers: { context7: {} } },
   });
   chmodSync(join(root, ".claude/hooks/check-all.sh"), 0o755);
+  chmodSync(join(root, ".cursor/hooks/deny-env-read.sh"), 0o755);
   const h = detect(root).harness;
   assert.deepEqual(h.claudeMd.sort(), ["CLAUDE.md", "apps/CLAUDE.md"]);
+  assert.deepEqual(h.agentsMd, ["AGENTS.md"]);
+  assert.equal(h.agentsImportedByClaude, true);
   assert.deepEqual(h.rules.find((x) => x.file === "perf.md").paths, ["src/app/**"]);
   assert.equal(h.rules.find((x) => x.file === "global.md").paths, null);
+  assert.deepEqual(h.cursorRules.find((x) => x.file === "tests.mdc").globs, ["**/*.spec.ts"]);
+  assert.equal(h.cursorRules.find((x) => x.file === "tests.mdc").alwaysApply, false);
+  assert.equal(h.cursorRules.find((x) => x.file === "global.mdc").alwaysApply, true);
+  assert.deepEqual(h.cursorHooks, { exists: true, version: 1, events: ["beforeReadFile", "stop"] });
+  assert.deepEqual(h.cursorHookScripts, [{ file: "deny-env-read.sh", executable: true }]);
   assert.deepEqual(h.settings, { exists: true, schema: true, allow: 1, ask: 0, deny: 1, hooks: ["Stop", "PostToolUse"] });
   assert.deepEqual(h.hooks, [{ file: "check-all.sh", executable: true }]);
   assert.deepEqual(h.gitHooks, { dir: true, hooksPath: ".githooks", files: ["pre-push"] });
   assert.equal(h.commitlint, true);
   assert.deepEqual(h.mcp, ["context7"]);
   assert.deepEqual(h.skills, ["improve-harness"]);
+});
+
+test("AGENTS.md inside .cursor skills is not project context", () => {
+  const r = detect(make({
+    "package.json": nextPkg(),
+    "AGENTS.md": "x",
+    ".cursor/skills/foo/AGENTS.md": "x",
+  }));
+  assert.deepEqual(r.harness.agentsMd, ["AGENTS.md"]);
+  assert.equal(r.harness.agentsImportedByClaude, false);
 });
 
 test("no-package is unsupported, not a crash", () => {

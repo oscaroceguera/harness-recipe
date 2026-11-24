@@ -55,15 +55,17 @@ Nothing is written without your approval.
 
 ```text
 ① sensors        scripts, lint, typecheck, tests
-② context        CLAUDE.md / AGENTS.md + rules
-③ permissions    allow / deny in settings
-④ hooks          SessionStart, PreToolUse, …
+② context        AGENTS.md (+ thin CLAUDE.md) · `.claude/rules` + `.cursor/rules`
+③ permissions    Claude allow/deny · Cursor `beforeReadFile` for secrets
+④ hooks          `.claude` hooks (Cursor via Third-Party Imports) · Cursor-native gaps
 ⑤ git hooks      commit-msg, pre-push, commitlint
 ⑥ tools          MCP (.mcp.json)
 ⑦ observability  improve-harness + review checklist
 ```
 
-Golden rule: a **fact** goes in CLAUDE.md or a rule · a **limit** in deny · a **check** in a hook, lint rule, or test.
+Golden rule: a **fact** goes in AGENTS.md or a rule · a **limit** in deny / read hook · a **check** in a hook, lint rule, or test.
+
+Claude ↔ Cursor: shared `AGENTS.md`, mirrored rules, portable hook scripts. Keep Cursor **Third-Party Imports** on so `.claude` hooks run in Cursor.
 
 ---
 
@@ -71,9 +73,10 @@ Golden rule: a **fact** goes in CLAUDE.md or a rule · a **limit** in deny · a 
 
 ```text
 Audit the harness of this project.
-What is my Claude Code setup missing?
+What is my Claude Code / Cursor setup missing?
 Generate the permissions layer.
 Generate the hooks.
+Make rules work when I switch to Cursor.
 Audit my microfrontends.
 ```
 
@@ -98,9 +101,12 @@ Unsupported stack → the report says so. It does not guess.
 ```text
 skills/harness-recipe/
 ├── SKILL.md              # agent instructions
-├── scripts/detect.mjs    # read-only scanner → JSON
+├── scripts/detect.mjs    # read-only scanner → JSON (Claude + Cursor harness)
 ├── references/           # per-layer + topology sheets
 ├── assets/templates/     # configs with {{placeholders}}
+│   ├── AGENTS.md · CLAUDE.md
+│   ├── dot-claude/       # → project .claude/
+│   └── dot-cursor/       # → project .cursor/
 └── evals/                # skill eval cases
 ```
 

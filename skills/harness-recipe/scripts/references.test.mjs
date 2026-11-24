@@ -23,7 +23,7 @@ function citations(doc) {
     const dirs = ticks.filter((t) => t.startsWith(TEMPLATES)).map((t) => t.endsWith("/") ? t : dirname(t) + "/");
     for (const t of ticks) {
       if (t.startsWith(TEMPLATES)) out.push({ where: `${doc}:${i + 1}`, cited: t, candidates: [t] });
-      else if (FILE_LIKE.test(t) && !t.startsWith(".claude/")) {
+      else if (FILE_LIKE.test(t) && !t.startsWith(".claude/") && !t.startsWith(".cursor/") && !t.startsWith("@")) {
         out.push({ where: `${doc}:${i + 1}`, cited: t, candidates: [TEMPLATES, ...dirs].map((d) => d + t) });
       }
     }

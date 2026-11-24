@@ -57,15 +57,17 @@ Nada se escribe sin tu aprobación.
 
 ```text
 ① sensors        scripts, lint, typecheck, tests
-② context        CLAUDE.md / AGENTS.md + rules
-③ permissions    allow / deny en settings
-④ hooks          SessionStart, PreToolUse, …
+② context        AGENTS.md (+ CLAUDE.md fino) · `.claude/rules` + `.cursor/rules`
+③ permissions    allow/deny de Claude · Cursor `beforeReadFile` para secretos
+④ hooks          hooks `.claude` (Cursor vía Third-Party Imports) · gaps nativos Cursor
 ⑤ git hooks      commit-msg, pre-push, commitlint
 ⑥ tools          MCP (.mcp.json)
 ⑦ observability  improve-harness + review checklist
 ```
 
-Regla de oro: un **hecho** va en CLAUDE.md o una rule · un **límite** en deny · un **check** en hook, lint o test.
+Regla de oro: un **hecho** va en AGENTS.md o una rule · un **límite** en deny / read hook · un **check** en hook, lint o test.
+
+Claude ↔ Cursor: `AGENTS.md` compartido, rules espejo, scripts de hooks portables. Mantén **Third-Party Imports** ON en Cursor para que corran los hooks de `.claude`.
 
 ---
 
@@ -73,9 +75,10 @@ Regla de oro: un **hecho** va en CLAUDE.md o una rule · un **límite** en deny 
 
 ```text
 Audita el harness de este proyecto.
-¿Qué le falta a mi setup de Claude Code?
+¿Qué le falta a mi setup de Claude Code / Cursor?
 Genera la capa de permisos.
 Genera los hooks.
+Haz que las rules funcionen al cambiar a Cursor.
 Audita mis microfrontends.
 ```
 
@@ -100,9 +103,12 @@ Stack no soportado → el reporte lo dice. No inventa.
 ```text
 skills/harness-recipe/
 ├── SKILL.md              # instrucciones del agente
-├── scripts/detect.mjs    # escáner de solo lectura → JSON
+├── scripts/detect.mjs    # escáner de solo lectura → JSON (Claude + Cursor)
 ├── references/           # fichas por capa y topología
 ├── assets/templates/     # configs con {{placeholders}}
+│   ├── AGENTS.md · CLAUDE.md
+│   ├── dot-claude/       # → .claude/ del proyecto
+│   └── dot-cursor/       # → .cursor/ del proyecto
 └── evals/                # casos de evaluación del skill
 ```
 

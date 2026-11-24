@@ -6,9 +6,12 @@
 
 | Piece | Root | Per package (`apps/*`, `packages/*`) |
 |-------|------|--------------------------------------|
-| `CLAUDE.md` | Short: topology, package list, root commands, how to run one package | Nested `CLAUDE.md` in each app: its stack, port, entry points |
+| `AGENTS.md` | Shared facts: topology, package list, root commands, how to run one package | Nested `AGENTS.md` in each app when Cursor works in that tree |
+| `CLAUDE.md` | Thin: `@AGENTS.md` + Compact instructions | Nested `CLAUDE.md` only if the app needs Claude-only notes (prefer nested `AGENTS.md`) |
 | `.claude/rules/*.md` | Yes, one folder; scope each rule with `paths: ["apps/web/**"]` | — |
+| `.cursor/rules/*.mdc` | Yes, mirrors of Claude rules (`globs` / `alwaysApply`) | — |
 | `.claude/settings.json`, hooks | Yes (one set) | — |
+| `.cursor/hooks.json` | Cursor-native gaps only (e.g. `beforeReadFile`) | — |
 | `.githooks/`, commitlint, `.mcp.json` | Yes | — |
 | Check scripts (lint, test, typecheck…) | Root `turbo.json` tasks / root scripts that fan out | Each package has its own scripts |
 | `eslint.config.*`, `vitest.config.*`, `playwright.config.*` | Shared config package if one exists (e.g. `packages/eslint-config`) | Each app's config, with globs relative to that app |

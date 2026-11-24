@@ -35,14 +35,14 @@ Change nothing without the user's answer.
 For each approved fix, pick the case:
 
 - Harness is broken (a symptom from `references/symptoms.md`): check the causes listed under that symptom one by one and fix the one you confirm.
-- Harness lacked a rule: put it in `eslint.config.mjs` if a machine can check it, in a file under `.claude/rules/` if it applies to one folder, in `CLAUDE.md` only if it applies to the whole project.
+- Harness lacked a rule: put it in `eslint.config.mjs` if a machine can check it, in matching files under `.claude/rules/` and `.cursor/rules/` if it applies to one folder, in `AGENTS.md` only if it applies to the whole project.
 
 ## 4. Hard rules
 
 - One minimal fix per problem.
 - Never weaken a check: no turning rules off, no `warn` instead of `error`, no `ignores`, no higher timeouts.
 - Extend an existing rule before adding a new one.
-- Keep `CLAUDE.md` under 200 lines.
+- Keep `AGENTS.md` (and the always-loaded set) under 200 lines; keep `CLAUDE.md` thin with `@AGENTS.md`.
 
 ## 5. Prove
 

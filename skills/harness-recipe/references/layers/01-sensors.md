@@ -1,6 +1,6 @@
 # Layer 1 — Sensors and scripts
 
-Install the check commands before any Claude Code config. A hook that calls a missing script is noise.
+Install the check commands before any Claude Code / Cursor agent config. A hook that calls a missing script is noise.
 
 ## Audit
 

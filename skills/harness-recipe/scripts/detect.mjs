@@ -5,8 +5,8 @@ import { readFileSync, readdirSync, statSync, existsSync, realpathSync } from "n
 import { join, resolve, relative } from "node:path";
 import { pathToFileURL } from "node:url";
 
-// .agents and .claude hold installed skills whose AGENTS.md/CLAUDE.md are not project context.
-const SKIP = new Set(["node_modules", ".git", ".next", "dist", "build", "out", ".turbo", ".pnpm-store", ".vercel", "coverage", ".agents", ".claude"]);
+// .agents, .claude, .cursor hold installed skills whose AGENTS.md/CLAUDE.md are not project context.
+const SKIP = new Set(["node_modules", ".git", ".next", "dist", "build", "out", ".turbo", ".pnpm-store", ".vercel", "coverage", ".agents", ".claude", ".cursor"]);
 const MAX_DEPTH = 4;
 const CONFIG_RE = /^(next|vite|webpack|rspack|rsbuild)\.config\.(js|mjs|cjs|ts|mts)$/;
 
@@ -157,6 +157,38 @@ function rulePaths(text) {
   return [...block.matchAll(/-\s*["']?([^"'\n]+?)["']?\s*$/gm)].map((m) => m[1]);
 }
 
+// Cursor `.mdc` frontmatter: globs (string or list) and alwaysApply.
+function cursorRuleMeta(text) {
+  const fm = text.match(/^---\n([\s\S]*?)\n---/)?.[1];
+  if (!fm) return { globs: null, alwaysApply: null };
+  const alwaysRaw = fm.match(/^alwaysApply:\s*(true|false)\s*$/m)?.[1];
+  const alwaysApply = alwaysRaw === "true" ? true : alwaysRaw === "false" ? false : null;
+  const inline = fm.match(/^globs:\s*["']?([^"'\n]+?)["']?\s*$/m);
+  if (inline && inline[1].trim()) {
+    return { globs: inline[1].split(",").map((s) => s.trim()).filter(Boolean), alwaysApply };
+  }
+  const block = fm.match(/^globs:\s*\n((?:\s*-.*\n?)+)/m)?.[1];
+  if (block) {
+    return {
+      globs: [...block.matchAll(/-\s*["']?([^"'\n]+?)["']?\s*$/gm)].map((m) => m[1]),
+      alwaysApply,
+    };
+  }
+  return { globs: null, alwaysApply };
+}
+
+function cursorHooks(root) {
+  const r = readJson(join(root, ".cursor", "hooks.json"));
+  if (r.error) return { error: r.error };
+  if (r.missing) return { exists: false, version: null, events: [] };
+  const hooks = r.value?.hooks ?? {};
+  return {
+    exists: true,
+    version: r.value?.version ?? null,
+    events: Object.keys(hooks),
+  };
+}
+
 function settings(root) {
   const r = readJson(join(root, ".claude", "settings.json"));
   if (r.error) return { error: r.error };
@@ -185,13 +217,29 @@ function gitConfig(root) {
 
 function harness(root) {
   const claude = join(root, ".claude");
+  const cursor = join(root, ".cursor");
   const hooksPath = gitConfig(root)?.match(/hooksPath\s*=\s*(.+)/)?.[1].trim() ?? null;
+  const agentsMd = findFiles(root, ["AGENTS.md"]);
+  const claudeMd = findFiles(root, ["CLAUDE.md"]);
+  const rootClaude = read(join(root, "CLAUDE.md")) ?? "";
   return {
-    claudeMd: findFiles(root, ["CLAUDE.md"]),
-    agentsMd: findFiles(root, ["AGENTS.md"]),
+    claudeMd,
+    agentsMd,
+    // True when CLAUDE.md pulls in the shared AGENTS.md (dual Claude Code + Cursor context).
+    agentsImportedByClaude: /@AGENTS\.md\b/.test(rootClaude),
     rules: list(join(claude, "rules"))
       .filter((f) => f.endsWith(".md"))
       .map((file) => ({ file, paths: rulePaths(read(join(claude, "rules", file))) })),
+    cursorRules: list(join(cursor, "rules"))
+      .filter((f) => f.endsWith(".mdc"))
+      .map((file) => ({ file, ...cursorRuleMeta(read(join(cursor, "rules", file))) })),
+    cursorHooks: cursorHooks(root),
+    cursorHookScripts: list(join(cursor, "hooks"))
+      .filter((f) => !isDir(join(cursor, "hooks", f)))
+      .map((file) => ({
+        file,
+        executable: (statSync(join(cursor, "hooks", file)).mode & 0o111) !== 0,
+      })),
     settings: settings(root),
     hooks: list(join(claude, "hooks")).map((file) => ({
       file,

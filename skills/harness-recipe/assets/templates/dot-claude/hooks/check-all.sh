@@ -2,7 +2,7 @@
 # Stop: run every project check before the agent may finish. Failures go back to the agent (exit 2).
 # Without --force it only runs when the working tree has changes. `{{pm}} run check` passes --force.
 # Never reads stdin: the Stop hook has no TTY, and a blocking read hangs the session.
-cd "${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel)}" || exit 0
+cd "${CLAUDE_PROJECT_DIR:-${CURSOR_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}}" || exit 0
 
 if [ "$1" != "--force" ] && [ -z "$(git status --porcelain)" ]; then
   exit 0

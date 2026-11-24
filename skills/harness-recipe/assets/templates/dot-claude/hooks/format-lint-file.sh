@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# PostToolUse(Edit|Write): format the edited file, then lint it. Lint errors go back to the agent (exit 2).
-cd "${CLAUDE_PROJECT_DIR:-.}" || exit 0
-file=$(jq -r '.tool_input.file_path // empty')
+# PostToolUse(Edit|Write) / afterFileEdit: format the edited file, then lint it. Lint errors go back to the agent (exit 2).
+cd "${CLAUDE_PROJECT_DIR:-${CURSOR_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}}" || exit 0
+file=$(jq -r '.tool_input.file_path // .file_path // empty')
 [ -z "$file" ] || [ ! -f "$file" ] && exit 0
 
 case "$file" in

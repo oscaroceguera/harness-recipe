@@ -1,6 +1,8 @@
 # Layer 4 — Hooks (verification the agent cannot skip)
 
-Hooks need `bash`, `jq`, `git`, `lsof`. Paths start with `"$CLAUDE_PROJECT_DIR"`. To block and reach the agent: message on stderr, exit 2 (exit 1 is invisible to the agent).
+Hooks need `bash`, `jq`, `git`, `lsof`. Claude scripts resolve the project via `"$CLAUDE_PROJECT_DIR"` (templates also fall back to `CURSOR_PROJECT_DIR` / git root). To block and reach the agent: message on stderr, exit 2 (exit 1 is invisible to the agent).
+
+**Claude Code + Cursor:** keep scripts under `.claude/hooks/` and register them in `.claude/settings.json`. Cursor loads those hooks when **Agents → Third-Party Imports** is enabled (default). Do **not** re-register the same scripts in `.cursor/hooks.json` (they would run twice). Use `.cursor/hooks.json` only for Cursor-native gaps Claude permissions do not cover (e.g. `beforeReadFile` → `deny-env-read.sh`).
 
 ## Audit
 
@@ -15,6 +17,9 @@ Hooks need `bash`, `jq`, `git`, `lsof`. Paths start with `"$CLAUDE_PROJECT_DIR"`
 | Test output trimmed | `PreToolUse` `Bash` hooks in settings | `filter-test-output.sh` (or quiet reporters in the test scripts) | full test output reaches the agent | — |
 | SessionStart matcher | read settings | includes `clear` | only `startup\|resume` | — |
 | Package manager in scripts | grep hook files for `npm`/`pnpm`/`yarn` | matches `packageManager` | — | another pm |
+| Portable stdin shape | grep `guard-commands.sh` / `format-lint-file.sh` for `.command` / `.file_path` fallbacks | present | Claude-only `.tool_input.*` (breaks if invoked as Cursor-native hooks) | — |
+| Cursor secrets hook | `harness.cursorHooks` + `deny-env-read.sh` | `beforeReadFile` registered, script executable | missing (rely only on Claude deny / Third-Party) | — |
+| No duplicate Cursor re-registration | read `.cursor/hooks.json` | only Cursor-native events (e.g. `beforeReadFile`), not a full copy of Claude PreToolUse/Stop | also lists `preToolUse`/`stop` pointing at the same `.claude/hooks/*` scripts (double fire under Third-Party Imports) | — |
 | `jq` installed | `command -v jq` | found | — | missing |
 
 ## Generate
@@ -44,10 +49,15 @@ Merge into `.claude/settings.json`:
 }
 ```
 
+**Cursor-native gap only:** merge `assets/templates/dot-cursor/hooks.json` into `.cursor/hooks.json` and copy `assets/templates/dot-cursor/hooks/deny-env-read.sh` to `.cursor/hooks/deny-env-read.sh`, then `chmod +x`. Do not add Claude PreToolUse/Stop equivalents here while Third-Party Imports is on.
+
+Tell the user: Cursor Settings → Agents → **Include Third-Party Plugins, Skills, and Other Configs** must stay enabled for `.claude/settings.json` hooks to run in Cursor.
+
 ## Prove it works
 
 ```bash
 echo '{"tool_input":{"command":"git push --force origin main"}}' | CLAUDE_PROJECT_DIR="$PWD" .claude/hooks/guard-commands.sh; echo "exit=$?"   # 2
+echo '{"command":"git push --force origin main"}' | .claude/hooks/guard-commands.sh; echo "exit=$?"   # 2 (Cursor-native shape)
 echo '{"tool_input":{"command":"git commit --no-verify -m x"}}'  | CLAUDE_PROJECT_DIR="$PWD" .claude/hooks/guard-commands.sh; echo "exit=$?"   # 2
 echo '{"tool_input":{"command":"{{pm}} test"}}'                    | CLAUDE_PROJECT_DIR="$PWD" .claude/hooks/guard-commands.sh; echo "exit=$?"   # 0
 echo '{"tool_input":{"command":"git commit -m \"block push --force\""}}' | CLAUDE_PROJECT_DIR="$PWD" .claude/hooks/guard-commands.sh; echo "exit=$?"   # 0 (message text)
@@ -57,6 +67,7 @@ echo '{"tool_input":{"command":"cat \".env.local\""}}'            | CLAUDE_PROJE
 echo '{"tool_input":{"command":"{{pm}} test"}}'      | .claude/hooks/filter-test-output.sh   # updatedInput: "set -o pipefail; {{pm}} test 2>&1 | tail -n 100"
 echo '{"tool_input":{"command":"{{pm}} test && x"}}' | .claude/hooks/filter-test-output.sh   # {}
 echo '{"tool_input":{"command":"git status"}}'       | .claude/hooks/filter-test-output.sh   # {}
+echo '{"file_path":"'"$PWD"'/.env"}' | .cursor/hooks/deny-env-read.sh; echo "exit=$?"   # 2
 CLAUDE_PROJECT_DIR="$PWD" .claude/hooks/session-start.sh          # three state lines
 {{pm}} run check                                                    # all green
 ```

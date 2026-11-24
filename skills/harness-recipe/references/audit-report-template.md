@@ -9,7 +9,7 @@ Legend: ✅ ready · ⚠️ works but improvable · ❌ missing or broken
 | Item | Status | Why it matters | Fix |
 |------|--------|----------------|-----|
 
-## 2. Context (CLAUDE.md and rules)
+## 2. Context (AGENTS.md, CLAUDE.md, and rules)
 | Item | Status | Why it matters | Fix |
 |------|--------|----------------|-----|
 
@@ -40,7 +40,8 @@ Legend: ✅ ready · ⚠️ works but improvable · ❌ missing or broken
 <!-- layers in recipe order (1→7); ❌ first. One line per layer: what to generate. -->
 
 ## Session habits (for you, not the agent)
-- `/context` when the session feels slow: shows what is using context (CLAUDE.md, rules, MCP, conversation).
-- `/compact <what to keep>` after finishing a subtask and before starting the next one.
-- `/clear` when switching to unrelated work; `/rename` first so you can `/resume` later.
-- `/mcp` to turn off servers this task does not need.
+- Claude: `/context` when the session feels slow: shows what is using context (CLAUDE.md / AGENTS.md, rules, MCP, conversation).
+- Claude: `/compact <what to keep>` after finishing a subtask and before starting the next one.
+- Claude: `/clear` when switching to unrelated work; `/rename` first so you can `/resume` later.
+- Claude: `/mcp` to turn off servers this task does not need.
+- Cursor: keep **Agents → Third-Party Imports** enabled so `.claude/settings.json` hooks run; use Project Rules / AGENTS.md for guidance that must survive agent switches.
