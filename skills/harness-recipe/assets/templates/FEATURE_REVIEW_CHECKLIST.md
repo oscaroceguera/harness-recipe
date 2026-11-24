@@ -1,4 +1,4 @@
-> **Audience:** human reviewers grading a finished feature run. This file is not part of the agent workflow.
+> **Audience:** human reviewers grading a finished feature run.
 
 ## Review the result
 
