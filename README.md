@@ -1,91 +1,123 @@
 # harness-recipe
 
-Skill que lleva la **Harness Recipe** a cualquier proyecto JS/TS: analiza el repo, audita las 7 capas del harness sin tocar nada y genera lo que falte, una capa a la vez (te muestra el diff y espera tu "sí").
+**Tu agente es tan bueno como el harness que lo rodea.**
 
-Compatible con el ecosistema abierto de [Agent Skills](https://agentskills.io) / [skills.sh](https://skills.sh).
+Este skill analiza tu proyecto JS/TS, audita las 7 capas del harness y genera lo que falte — una capa a la vez, con diff y tu “sí” antes de tocar nada.
 
-## Instalar
+Compatible con [Agent Skills](https://agentskills.io) · [skills.sh](https://skills.sh) · Claude Code · Cursor
 
-En el proyecto donde quieras usarlo:
+---
+
+## Install
 
 ```bash
 npx skills add oscaroceguera/harness-recipe
 ```
 
-Opciones útiles:
-
 ```bash
-# Solo este skill (si el repo crece)
-npx skills add oscaroceguera/harness-recipe --skill harness-recipe
-
 # Global (todos tus proyectos)
 npx skills add oscaroceguera/harness-recipe -g
 
-# Listar sin instalar
+# Solo listar
 npx skills add oscaroceguera/harness-recipe -l
 ```
 
-Funciona con Claude Code, Cursor y otros agentes que lean skills en `.agents/skills/`, `.claude/skills/` o `.cursor/skills/`.
+---
 
-## Cómo pedirlo
+## How it works
 
-- "Audita el harness de este proyecto."
-- "¿Qué le falta a mi setup de Claude Code?"
-- "Genera la capa de permisos."
-- "Genera los hooks."
-- "Audita mis microfrontends."
+```text
+  analyze  →  audit  →  generate
+     │          │          │
+   detect     ✅⚠️❌      diff + yes
+   (read)    report      (write)
+```
 
-## Qué hace
+| Step | What happens |
+|------|----------------|
+| **1. Analyze** | `detect.mjs` escanea el repo (solo lectura): package manager, topología, harness existente |
+| **2. Audit** | Reporte en español, tabla por capa, arreglo concreto por cada ❌ |
+| **3. Generate** | Una capa a la vez. Te muestra el diff. Espera tu OK. Luego escribe |
 
-1. **Analiza** — corre `detect.mjs` (solo lectura) y resume topología, package manager y harness existente.
-2. **Audita** — reporte en español, tabla por capa con ✅/⚠️/❌ y el arreglo concreto.
-3. **Genera** — una capa a la vez, con diff y confirmación antes de escribir.
+Nada se escribe sin tu aprobación.
 
-Las 7 capas: sensores y scripts · contexto (CLAUDE.md y rules) · permisos · hooks · git hooks y commits · tools (MCP) · observabilidad.
+---
 
-## Qué soporta
+## The 7 layers
 
-| Soportado | Aún no |
-|-----------|--------|
-| Next.js, Vite, Node, librerías (JS/TS) | Python, Go, otros lenguajes |
-| App sola | React Native |
-| Monorepo: Turborepo, workspaces de pnpm, npm, yarn y bun | Nx |
-| Module Federation (host y remotes) | Vercel Microfrontends |
-| Clon normal, clon `--bare` y worktrees | Pipelines de CI |
+```text
+① sensors        scripts, lint, typecheck, tests
+② context        CLAUDE.md / AGENTS.md + rules
+③ permissions    allow / deny en settings
+④ hooks          SessionStart, PreToolUse, …
+⑤ git hooks      commit-msg, pre-push, commitlint
+⑥ tools          MCP (.mcp.json)
+⑦ observability  improve-harness + review checklist
+```
 
-Si el proyecto no está soportado, el reporte lo dice en vez de adivinar.
+La regla de oro: un **hecho** va en CLAUDE.md o una rule · un **límite** en deny · un **check** en hook, lint o test.
 
-## Estructura del paquete
+---
+
+## Try saying
+
+```text
+Audita el harness de este proyecto.
+¿Qué le falta a mi setup de Claude Code?
+Genera la capa de permisos.
+Genera los hooks.
+Audita mis microfrontends.
+```
+
+---
+
+## Support matrix
+
+| ✅ Yes | ❌ Not yet |
+|--------|------------|
+| Next.js, Vite, Node, libs JS/TS | Python, Go, … |
+| Single app | React Native |
+| Turborepo · pnpm / npm / yarn / bun workspaces | Nx |
+| Module Federation (host + remotes) | Vercel Microfrontends |
+| Normal clone · `--bare` · worktrees | CI pipelines |
+
+Unsupported stack → el reporte lo dice. No inventa.
+
+---
+
+## Package layout
 
 ```text
 skills/harness-recipe/
-  SKILL.md                 # instrucciones del agente
-  scripts/detect.mjs       # escaneo de solo lectura → JSON
-  references/              # fichas por capa y topología
-  assets/templates/        # plantillas con {{placeholders}}
-  evals/                   # casos de evaluación del skill
+├── SKILL.md              # agent instructions
+├── scripts/detect.mjs    # read-only scanner → JSON
+├── references/           # per-layer + topology sheets
+├── assets/templates/     # configs with {{placeholders}}
+└── evals/                # skill eval cases
 ```
 
-Las plantillas bajo `assets/templates/dot-claude/skills/` (`feature-workflow`, `improve-harness`) **no** se instalan como skills del paquete: se copian al proyecto destino solo si generas esas capas.
+`feature-workflow` e `improve-harness` viven en templates: se copian al proyecto solo si generas esas capas. No se instalan como skills del paquete.
 
-## Seguridad
+---
 
-- `scripts/detect.mjs` solo lee el filesystem e imprime JSON; no escribe ni ejecuta el proyecto.
-- La generación de archivos ocurre solo en el paso 3, después de que apruebes el diff de cada capa.
-- Revisa el skill antes de instalarlo, como cualquier código de terceros.
+## Safety
 
-## Desarrollo
+- `detect.mjs` **solo lee**. Imprime JSON. No escribe ni ejecuta tu app.
+- La generación es el paso 3, **después** de que apruebes el diff.
+- Trátalo como código de terceros: léelo antes de instalar.
+
+---
+
+## Dev
 
 ```bash
-# Tests del detector
 node --test skills/harness-recipe/scripts/detect.test.mjs
 node --test skills/harness-recipe/scripts/references.test.mjs
 
-# Probar detección contra un repo
-node skills/harness-recipe/scripts/detect.mjs /ruta/al/proyecto
-
-# Validar discovery local
+node skills/harness-recipe/scripts/detect.mjs /path/to/project
 npx skills add . -l
 ```
 
-Licencia: [MIT](./LICENSE).
+---
+
+MIT © [oscaroceguera](https://github.com/oscaroceguera)
