@@ -85,8 +85,9 @@
       "fixture": "Next.js + pnpm single app with a fat CLAUDE.md only, no AGENTS.md, one .claude/rules/tests.md with paths, no .cursor/rules",
       "expected_output": "A diff that extracts shared content to AGENTS.md, thins CLAUDE.md with @AGENTS.md, and adds matching .cursor/rules/*.mdc mirrors before writing.",
       "assertions": [
-        "A diff is shown and the skill waits for approval before writing",
+        "A diff is shown before any project write; files are written only after explicit user approval",
         "AGENTS.md is created with Project/Commands from the project",
+        "AGENTS.md has no migration/meta lines about leaving CLAUDE.md or 'shared with Cursor via AGENTS'",
         "CLAUDE.md keeps @AGENTS.md and # Compact instructions without duplicating Commands",
         "A .cursor/rules/tests.mdc mirror is proposed with globs matching the Claude paths",
         "No rewrite of unrelated user prose outside the proposed diff"

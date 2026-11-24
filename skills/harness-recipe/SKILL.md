@@ -11,7 +11,7 @@ license: MIT
 compatibility: Requires Node.js 18+ to run the bundled detect.mjs scanner.
 metadata:
   author: oscaroceguera
-  version: "1.1.1"
+  version: "1.1.2"
 model: sonnet
 ---
 
