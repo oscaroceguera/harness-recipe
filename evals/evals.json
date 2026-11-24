@@ -1,0 +1,80 @@
+{
+  "skill": "harness-recipe",
+  "cases": [
+    {
+      "id": "audit-next-single",
+      "prompt": "audita el harness de este proyecto y dime qué me falta",
+      "fixture": "Next.js app with src/app, pnpm-lock.yaml, a pnpm-workspace.yaml holding only onlyBuiltDependencies, no .claude/ folder",
+      "expected_output": "A Spanish audit report with a table per layer, the project identified as a single pnpm Next.js app, and no file changes.",
+      "assertions": [
+        "detect.mjs was run before any judgment",
+        "Topology reported as single (the pnpm-workspace.yaml without packages: is not treated as a monorepo)",
+        "Every layer 1-7 has a table with ✅/⚠️/❌ rows and a concrete fix for each ❌",
+        "Suggested commands use pnpm, never npm",
+        "No file in the project was created or modified (git status unchanged)"
+      ]
+    },
+    {
+      "id": "audit-vite-npm",
+      "prompt": "what is my claude code setup missing?",
+      "fixture": "Vite + React app without src/app, package-lock.json, CLAUDE.md present, no hooks",
+      "expected_output": "An audit that treats the app as Vite (no Next-specific ESLint config or app router paths) and flags missing hooks.",
+      "assertions": [
+        "Port reported as 5173 from the Vite default",
+        "No suggestion references next/eslint-config-next or src/app paths",
+        "Layer 4 (hooks) rows are ❌ with the hook files named",
+        "Existing CLAUDE.md is evaluated, not replaced"
+      ]
+    },
+    {
+      "id": "generate-permissions-turborepo",
+      "prompt": "genera la capa de permisos para este monorepo",
+      "fixture": "Turborepo + pnpm with apps/web (next, port 3000) and apps/admin (next, port 3001), no .claude/settings.json",
+      "expected_output": "A diff for one root .claude/settings.json, shown before writing, with pnpm patterns and turbo allows.",
+      "assertions": [
+        "A diff is shown and the skill waits for approval before writing",
+        "Exactly one .claude/settings.json at the repo root; none inside apps/",
+        "allow contains pnpm run patterns and a turbo run / --filter pattern",
+        "deny contains Read(./.env) and Read(./.env.*); ask contains Bash(git push*)",
+        "$schema key present; no settings.local.json created"
+      ]
+    },
+    {
+      "id": "audit-module-federation",
+      "prompt": "audit the harness of my microfrontends",
+      "fixture": "Workspace with apps/host (vite federation, remotes) and apps/cart (vite federation, exposes), react 19 in host and react 18 in cart",
+      "expected_output": "An audit that identifies host and remote roles and flags the shared react major mismatch as ❌.",
+      "assertions": [
+        "module-federation.md topology reference was loaded",
+        "Host and remote roles are named per package",
+        "Shared singleton react version mismatch (19 vs 18) reported as ❌",
+        "Recommends a module-federation rule documenting the exposes contract",
+        "Each app's port is listed separately"
+      ]
+    },
+    {
+      "id": "analyze-from-symlinked-skill",
+      "prompt": "audita el harness de este proyecto",
+      "fixture": "Next.js + pnpm single app where the skill is installed as a symlink: .claude/skills/harness-recipe -> .agents/skills/harness-recipe",
+      "expected_output": "Step 1 runs detect.mjs through the symlinked path and gets the JSON Report; the audit continues from it.",
+      "assertions": [
+        "detect.mjs was invoked through .claude/skills/harness-recipe/scripts/detect.mjs (the symlink path)",
+        "The command printed a JSON Report (not empty output)",
+        "The summary names pnpm, topology single and framework next"
+      ]
+    },
+    {
+      "id": "audit-context-budget",
+      "prompt": "mi sesión de Claude se queda sin contexto muy rápido, audita el harness",
+      "fixture": "Next.js + pnpm single app, 320-line CLAUDE.md with a numbered deploy procedure, no '# Compact instructions', a rule without paths, PreToolUse only guard-commands.sh",
+      "expected_output": "Layer 2 flags size, missing compact instructions and the procedure; layer 4 flags untrimmed test output; report ends with session habits.",
+      "assertions": [
+        "Size row is ❌ (> 300 lines)",
+        "Compact instructions row is ❌ and the fix uses the exact heading '# Compact instructions'",
+        "The deploy procedure is proposed to move to a skill, not to an @import",
+        "Layer 4 'Test output trimmed' row is ⚠️ and names filter-test-output.sh",
+        "The report contains the 'Hábitos de sesión' section with /context, /compact and /clear"
+      ]
+    }
+  ]
+}

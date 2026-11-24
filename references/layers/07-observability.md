@@ -1,0 +1,23 @@
+# Layer 7 — Observability and improvement
+
+When an agent fails, fix the harness, not the prompt: a missing **fact** → CLAUDE.md / rule; a missing **limit** → deny rule; a missing **check** → hook, lint rule or test. Then resend the same request.
+
+## Audit
+
+| Item | Report field | ✅ | ⚠️ | ❌ |
+|------|--------------|----|----|----|
+| Improvement loop | `harness.skills` includes `improve-harness` | yes | — | no |
+| Review checklist | `FEATURE_REVIEW_CHECKLIST.md` at root | present | — | absent (optional; ⚠️ at most) |
+| Context budget | root CLAUDE.md lines + rules without `paths` + MCP servers | small | large always-loaded set | — |
+
+## Generate
+
+- Copy `assets/templates/dot-claude/skills/improve-harness/` (SKILL.md + `references/symptoms.md`) to `.claude/skills/improve-harness/`.
+- Optional: `assets/templates/FEATURE_REVIEW_CHECKLIST.md` at the root.
+
+## Prove it works
+
+| Request | Expected |
+|---------|----------|
+| `/context` | Shows the always-loaded set; nothing unexpected |
+| "Use improve-harness: the agent ignored rule X." | Skill collects, asks, proposes a fact/limit/check fix, then resends the original request |
